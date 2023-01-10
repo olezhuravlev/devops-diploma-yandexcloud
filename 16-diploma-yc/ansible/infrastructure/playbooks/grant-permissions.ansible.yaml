@@ -1,0 +1,60 @@
+---
+- name: Setup Kubernetes Cluster
+  hosts: k8n_control_plane
+  tasks:
+    - name: Grant permissions on cluster to non-sudo remote user
+      block:
+        - name: Create remote directory if it does not exist
+          ansible.builtin.file:
+            path: /home/ubuntu/.kube
+            state: directory
+            mode: '0700'
+        - name: Copy file with owner and permissions (file 'admin.conf' created after 'kubeadm init'!)
+          become: true
+          ansible.builtin.copy:
+            src: /etc/kubernetes/admin.conf
+            dest: /home/ubuntu/.kube/
+            remote_src: yes
+            owner: ubuntu
+            group: ubuntu
+            mode: '0644'
+        - name: Rename file 'admin.conf' to 'config'
+          ansible.builtin.command: mv /home/ubuntu/.kube/admin.conf /home/ubuntu/.kube/config
+
+- name: Grant permissions on cluster to non-sudo localhost user
+  hosts: localhost
+  tasks:
+    - name: Create local directory
+      become: false
+      ansible.builtin.file:
+        path: /home/oleg/.kube
+        state: directory
+        mode: '0700'
+
+- name: Grant localhost access to cluster
+  hosts: cp1
+  tasks:
+    - name: Download file './kube/config' from cluster to localhost directory
+      ansible.builtin.fetch:
+        src: /home/ubuntu/.kube/config
+        dest: /home/oleg/.kube/
+        flat: yes
+
+- name: Grant localhost access to cluster
+  hosts: localhost
+  tasks:
+    - name: Replace private IP-address with public one
+      ansible.builtin.replace:
+        path: /home/oleg/.kube/config
+        regexp: ^(?P<prefix>.*server:\s*https:\/\/)(\d+\.\d+\.\d+\.\d+)(?P<postfix>:\d*.+)$
+        replace: '\g<prefix>{{ public_ip.cp1 }}\g<postfix>'
+
+    - name: Show available nodes
+      block:
+        - name: Get available nodes
+          ansible.builtin.command: kubectl get nodes
+          register: kubectl_get_nodes
+
+        - name: Available nodes
+          ansible.builtin.debug:
+            msg: "{{ kubectl_get_nodes.stdout.split('\n') }}"

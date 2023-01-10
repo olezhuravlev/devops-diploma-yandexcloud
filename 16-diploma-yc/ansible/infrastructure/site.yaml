@@ -1,0 +1,12 @@
+---
+- import_playbook: playbooks/pre-setup.ansible.yaml
+- import_playbook: playbooks/setup.ansible.yaml
+- import_playbook: playbooks/mount-cluster.ansible.yaml
+- import_playbook: playbooks/grant-permissions.ansible.yaml
+- import_playbook: playbooks/post-setup.ansible.yaml
+- import_playbook: playbooks/deploy-dashboard.ansible.yaml
+- import_playbook: playbooks/deploy-helm.ansible.yaml
+- import_playbook: playbooks/deploy-tc.ansible.yaml
+- import_playbook: playbooks/deploy-pg.ansible.yaml
+- import_playbook: playbooks/deploy-web-app.ansible.yaml
+- import_playbook: playbooks/deploy-web-app-cron.ansible.yaml

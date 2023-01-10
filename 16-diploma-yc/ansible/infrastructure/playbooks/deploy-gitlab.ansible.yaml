@@ -1,0 +1,26 @@
+---
+- name: Setup Gitlab infrastructure
+  hosts: k8n_control_plane
+  tasks:
+    - name: Install Gitlab
+      block:
+        - name: Add stable 'Helm' chart repo
+          kubernetes.core.helm_repository:
+            name: gitlab
+            repo_url: https://charts.gitlab.io/
+        - name: Deploy the latest version of Gitlab
+          kubernetes.core.helm:
+            name: gitlab
+            chart_ref: gitlab/gitlab
+            release_namespace: cicd
+            create_namespace: true
+            values:
+              global:
+                hosts:
+                  # domain: example.com
+                  externalIP: 158.160.55.84
+              certmanager-issuer:
+                email: olezhuravlev@gmail.com
+              postgresql:
+                image:
+                  tag: 13.6.0

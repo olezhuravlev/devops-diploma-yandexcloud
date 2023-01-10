@@ -1,0 +1,40 @@
+---
+- name: Setup Kubernetes Dashboard
+  hosts: k8n_control_plane
+  tasks:
+    - name: Deploy 'network-multitool' container
+      block:
+      - name: Upload manifest for Kubernetes Dashboard
+        ansible.builtin.template:
+          src: ./templates/dashboard.yaml
+          dest: /home/ubuntu/dashboard.yaml
+      - name: Apply manifest for Kubernetes Dashboard
+        ansible.builtin.command: kubectl apply -f /home/ubuntu/dashboard.yaml
+    - name: Create service account
+      block:
+      - name: Upload manifest for service account
+        ansible.builtin.template:
+          src: ./templates/admin-user-sa.yaml
+          dest: /home/ubuntu/admin-user-sa.yaml
+      - name: Apply manifest for service account
+        ansible.builtin.command: kubectl apply -f /home/ubuntu/admin-user-sa.yaml
+    - name: Bind service account to cluster
+      block:
+      - name: Upload manifest for RBAC
+        ansible.builtin.template:
+          src: ./templates/admin-user-rbac.yaml
+          dest: /home/ubuntu/admin-user-rbac.yaml
+      - name: Apply manifest for RBAC
+        ansible.builtin.command: kubectl apply -f /home/ubuntu/admin-user-rbac.yaml
+    - name: Generate token for dashboard access
+      block:
+      - name: "Generate access token: kubectl -n kubernetes-dashboard create token admin-user"
+        ansible.builtin.command: kubectl -n kubernetes-dashboard create token admin-user
+        register: token
+      - name: Access token is
+        ansible.builtin.debug:
+          msg:
+          - "{{ token.stdout }}"
+          - "1. Run 'kubectl proxy' on host supposed to be used for access to Kubernetes Dashboard"
+          - "2. Proceed to the link: http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/"
+          - "3. Select 'Token' option and enter the token."

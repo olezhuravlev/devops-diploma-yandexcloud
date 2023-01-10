@@ -1,0 +1,144 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pg-pv-8gb
+  namespace: cicd
+  labels:
+    app: gitlab
+    component: postgresql
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: normal
+  capacity:
+    storage: 8Gi
+  hostPath:
+    path: /pg-pv-8gb
+  persistentVolumeReclaimPolicy: Retain
+#  # gitlab-prometheus-server
+#  claimRef:
+#    app: prometheus
+#    app.kubernetes.io/managed-by: Helm
+#    chart: prometheus-15.0.4
+#    component: server
+#    heritage: Helm
+#    release: gitlab
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-fs-8gb-2
+  namespace: cicd
+  labels:
+    app: gitlab
+spec:
+  storageClassName: ""
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 8Gi
+  volumeMode: Filesystem
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /pv-8gb-2
+  #data-gitlab-postgresql-0
+  #  claimRef:
+  #    app: postgresql
+  #    release: gitlab
+  #    role: master
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-fs-8gb-2
+  namespace: cicd
+  labels:
+    app: gitlab
+spec:
+  storageClassName: ""
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 8Gi
+  volumeMode: Filesystem
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /pv-8gb-2
+  #data-gitlab-postgresql-0
+  #  claimRef:
+  #    app: postgresql
+  #    release: gitlab
+  #    role: master
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-fs-8gb-3
+  namespace: cicd
+  labels:
+    app: gitlab
+spec:
+  storageClassName: ""
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 8Gi
+  volumeMode: Filesystem
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /pv-8gb-3
+  #redis-data-gitlab-redis-master-0
+  #  claimRef:
+  #    app: redis
+  #    release: gitlab
+  #    role: master
+  #    component: master
+  #    heritage: Helm
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-fs-10gb
+  namespace: cicd
+  labels:
+    app: minio
+spec:
+  storageClassName: ""
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 10Gi
+  volumeMode: Filesystem
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /pv-10gb
+# gitlab-minio
+#  claimRef:
+#    app: minio
+#    release: gitlab
+#    heritage: Helm
+#    chart: minio-0.4.3
+#    app.kubernetes.io/managed-by: Helm
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-fs-50gb
+  namespace: cicd
+  labels:
+    app: gitlab
+spec:
+  storageClassName: ""
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 50Gi
+  volumeMode: Filesystem
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /pv-50gb
+# repo-data-gitlab-gitaly-0
+#  claimRef:
+#    app: gitaly
+#    release: gitlab

@@ -1,0 +1,12 @@
+---
+- name: Setup workload
+  hosts: k8n_control_plane
+  tasks:
+    - name: Install last version of web-application
+      kubernetes.core.helm:
+        name: web-app
+        chart_ref: diploma-chart/web-app
+        #chart_version: Omitted to install the latest version!
+        update_repo_cache: true
+        release_namespace: default
+        create_namespace: false

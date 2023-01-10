@@ -1,0 +1,93 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: teamcity-agent
+  namespace: cicd
+  labels:
+    app: teamcity
+    component: teamcity-agent
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: teamcity
+      component: teamcity-agent
+  template:
+    metadata:
+      labels:
+        app: teamcity
+        component: teamcity-agent
+    spec:
+      containers:
+        - name: teamcity-agent
+          image: jetbrains/teamcity-agent
+          ports:
+            - containerPort: 9090
+              protocol: TCP
+          env:
+            - name: SERVER_URL
+              value: "teamcity-server-svc.cicd.svc.cluster.local:8111"
+            - name: DOCKER_IN_DOCKER
+              value: start
+          securityContext:
+            privileged: true
+            runAsUser: 0
+          volumeMounts:
+            - mountPath: /teamcity-agent
+              name: teamcity-agent-volume
+#            - var/run/docker.sock:/var/run/docker.sock
+      volumes:
+        - name: teamcity-agent-volume
+          persistentVolumeClaim:
+            claimName: teamcity-agent-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: teamcity-agent-svc
+  namespace: cicd
+  labels:
+    app: teamcity
+    component: teamcity-agent
+spec:
+  ports:
+    - name: teamcity-agent-web
+      port: 9090
+  selector:
+    app: teamcity
+    component: teamcity-agent
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: teamcity-agent-pvc
+  namespace: cicd
+  labels:
+    app: teamcity
+    component: teamcity-agent
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: teamcity-agent-pv
+  namespace: cicd
+  labels:
+    app: teamcity
+    component: teamcity-agent
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 1Gi
+  volumeMode: Filesystem
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /teamcity-agent-1gb

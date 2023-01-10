@@ -1,0 +1,25 @@
+---
+all:
+  hosts:
+    cp1:
+      ansible_host: "{{ public_ip['cp1'] }}"
+    node1:
+      ansible_host: "{{ public_ip['node1'] }}"
+    node2:
+      ansible_host: "{{ public_ip['node2'] }}"
+    tc-server:
+      ansible_host: "{{ public_ip['tc-server'] }}"
+    tc-agent:
+      ansible_host: "{{ public_ip['tc-agent'] }}"
+  children:
+    k8n_cluster:
+      hosts:
+        cp1:
+        node1:
+        node2:
+    k8n_control_plane:
+      hosts:
+        cp1:
+  vars:
+    ansible_connection_type: ssh
+    ansible_user: "{{ ansible_user }}"

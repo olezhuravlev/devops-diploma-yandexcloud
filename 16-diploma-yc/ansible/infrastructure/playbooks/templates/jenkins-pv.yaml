@@ -1,0 +1,41 @@
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: local-storage
+  namespace: cicd
+provisioner: kubernetes.io/no-provisioner
+#volumeBindingMode: WaitForFirstConsumer
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: jenkins-pv-volume
+  namespace: cicd
+  labels:
+    type: local
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: normal
+  capacity:
+    storage: 5Gi
+  hostPath:
+    path: /pg-pv-8gb
+  persistentVolumeReclaimPolicy: Retain
+  claimRef:
+    name: jenkins-pv-claim
+    namespace: cicd
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jenkins-pv-claim
+  namespace: cicd
+spec:
+  storageClassName: local-storage
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi

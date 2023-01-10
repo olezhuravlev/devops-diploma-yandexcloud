@@ -1,0 +1,9 @@
+---
+- name: Setup Kubernetes Cluster
+  hosts: k8n_control_plane
+  tasks:
+    - name: Applying 'Kubespray' to create Kubernetes cluster
+      ansible.builtin.shell:
+        cmd: "ansible-playbook -i {{ kubespray_dir }}/inventory/{{ cluster_destination_dir }}/hosts.yaml cluster.yml -b -v"
+        chdir: "{{ kubespray_dir }}"
+      register: ansible_playbook_init

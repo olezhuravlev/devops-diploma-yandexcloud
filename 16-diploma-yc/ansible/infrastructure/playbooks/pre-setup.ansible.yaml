@@ -1,0 +1,28 @@
+---
+- name: Setup Kubernetes Cluster
+  hosts: localhost
+  tasks:
+    - name: Provide settings with 'k8s-cluster'
+      block:
+        - name: Set supplementary addresses in 'k8s-cluster.yml'
+          ansible.builtin.replace:
+            path: ./k8s_cluster/k8s-cluster.yml
+            regexp: ^(?P<prefix>.*supplementary_addresses_in_ssl_keys:\s*\[)(.*)(?P<postfix>\]\s*)$
+            replace: '\g<prefix>{{ supplementary_addresses_in_ssl_keys }}\g<postfix>'
+        - name: Set service CIDR in 'k8s-cluster.yml'
+          ansible.builtin.replace:
+            path: ./k8s_cluster/k8s-cluster.yml
+            regexp: ^(?P<prefix>kube_service_addresses:\s*)(.*)(?P<postfix>$)
+            replace: '\g<prefix>{{ kube_service_addresses }}\g<postfix>'
+        - name: Set pods CIDR in 'k8s-cluster.yml'
+          ansible.builtin.replace:
+            path: ./k8s_cluster/k8s-cluster.yml
+            regexp: ^(?P<prefix>kube_pods_subnet:\s*)(.*)(?P<postfix>$)
+            replace: '\g<prefix>{{ kube_pods_subnet }}\g<postfix>'
+
+    - name: Copy private key to directory 'tmp'
+      ansible.builtin.copy:
+        src: "~/.ssh/id_rsa"
+        dest: "./templates/id_rsa"
+        mode: 0600
+

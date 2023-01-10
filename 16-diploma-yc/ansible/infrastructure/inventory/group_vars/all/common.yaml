@@ -1,0 +1,21 @@
+---
+# Network created by Terraform (eth0).
+internal_ip:
+  cp1: 10.10.10.1
+  node1: 10.20.20.1
+  node2: 10.30.30.1
+
+# Network preferences set in file `k8s-cluster.yml`.
+supplementary_addresses_in_ssl_keys: "{{ public_ip['cp1'] }}"
+kube_service_addresses: 10.32.0.0/16 # Network to be created/used by Kubernetes.
+kube_pods_subnet: 10.200.0.0/16 # Network to be created/used by CNI.
+# Network for pods should not be a part of your existing network because network plugin
+#  uses encapsulation to connect pods on different nodes to one overlay network!
+
+ansible_user: "ubuntu"
+
+kubespray_gitclone_url: "https://github.com/kubernetes-sigs/kubespray.git"
+kubespray_dir: "/home/ubuntu/kubespray"
+
+cluster_source_dir: "sample"
+cluster_destination_dir: "mycluster"

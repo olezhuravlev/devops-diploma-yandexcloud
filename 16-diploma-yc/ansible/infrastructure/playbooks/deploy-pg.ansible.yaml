@@ -1,0 +1,70 @@
+---
+- name: Postgres installation
+  hosts: tc-server
+  become: yes
+  vars:
+    postgres_root_user: admin
+    postgres_root_pass: admin
+    allow_world_readable_tmpfiles: true
+  tasks:
+    - name: Update apt repo and cache
+      apt:
+        update_cache: yes
+        force_apt_get: yes
+        cache_valid_time: 3600
+    - name: Upgrade all packages on servers
+      apt:
+        upgrade: dist
+        force_apt_get: yes
+    - name: Install required packages
+      apt:
+        name:
+          - wget
+          - python3-psycopg2
+          - acl
+        state: latest
+    - name: Set up PostgreSQL 14 repo
+      shell: |
+        echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list
+        wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+    - name: Install PostgreSQL
+      apt:
+        name: postgresql-14
+        update_cache: yes
+      notify:
+        - Enable_Postgresql
+    - name: Ensure PostgreSQL is listening
+      lineinfile:
+        dest: /etc/postgresql/14/main/postgresql.conf
+        regexp: '^listen_addresses\s*='
+        line: "listen_addresses='*'"
+        state: present
+      notify: Restart_Postgresql
+    - name: Add new configuration to "pg_hba.conf"
+      blockinfile:
+        dest: /etc/postgresql/14/main/pg_hba.conf
+        block: |
+          host    all             all             0.0.0.0/0                md5
+          host    all             all             ::/0                     md5
+      notify: Restart_Postgresql
+    - name: Change peer identification to trust
+      shell: /bin/sed -i '/^local/s/peer/trust/' /etc/postgresql/14/main/pg_hba.conf
+      notify: Restart_Postgresql
+    - name: Create a Superuser PostgreSQL database user
+      become: yes
+      become_user: postgres
+      postgresql_user:
+        name: '{{ postgres_root_user }}'
+        password: '{{ postgres_root_pass }}'
+        role_attr_flags: CREATEDB,SUPERUSER,CREATEROLE
+        encrypted: yes
+        state: present
+  handlers:
+    - name: Restart_Postgresql
+      systemd:
+        name: postgresql
+        state: restarted
+    - name: Enable_Postgresql
+      systemd:
+        name: postgresql
+        enabled: yes

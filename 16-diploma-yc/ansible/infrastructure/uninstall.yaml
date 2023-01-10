@@ -1,0 +1,14 @@
+---
+- name: Uninstall something
+  hosts: k8n_control_plane
+  tasks:
+    - name: Uninstall Prometheus
+      block:
+        - name: Uninstall 'Prometheus' latest version
+          kubernetes.core.helm:
+            state: absent
+            force: true
+            chart_ref: prometheus-community/prometheus
+            release_namespace: monitoring
+            release_name: prometheus
+
