@@ -50,13 +50,16 @@ variable "backend_bucket_id" {
   default = "tf-backend"
 }
 
-variable "access_key" {
-  description = "access_key"
-  type        = string
-  sensitive   = true
-}
-variable "secret_key" {
-  description = "secret_key"
-  type        = string
-  sensitive   = true
-}
+## Environment variable TF_VAR_access_key
+#variable "access_key" {
+#  description = "access_key"
+#  type        = string
+#  sensitive   = true
+#}
+#
+## Environment variable TF_VAR_secret_key
+#variable "secret_key" {
+#  description = "secret_key"
+#  type        = string
+#  sensitive   = true
+#}

@@ -6,18 +6,6 @@ terraform {
     }
   }
   required_version = ">= 0.13"
-
-  backend "s3" {
-    endpoint   = "storage.yandexcloud.net"
-    bucket     = "tf-backend"
-    region     = "ru-central1-a"
-    key        = "backend/terraform.tfstate"
-    access_key = "YCAJE6hn3fq55gxSM1xw6PFA-"
-    secret_key = "YCOQGdJ6CuLDKIAqiDqYrvxStZxiUp8ecJqsYJtJ"
-
-    skip_region_validation      = true
-    skip_credentials_validation = true
-  }
 }
 
 # Define provider.
