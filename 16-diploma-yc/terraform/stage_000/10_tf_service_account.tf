@@ -7,7 +7,7 @@ resource "yandex_iam_service_account" "terraform-sa" {
 
 # Role "editor" holders.
 resource "yandex_resourcemanager_folder_iam_binding" "editor" {
-  folder_id = yandex_resourcemanager_folder.diploma-folder.id
+  folder_id   = yandex_resourcemanager_folder.diploma-folder.id
   role      = "editor"
   members   = [
     "serviceAccount:${yandex_iam_service_account.terraform-sa.id}"
@@ -16,7 +16,7 @@ resource "yandex_resourcemanager_folder_iam_binding" "editor" {
 
 # Role "storage-admin" holders.
 resource "yandex_resourcemanager_folder_iam_binding" "storage-admin" {
-  folder_id = yandex_resourcemanager_folder.diploma-folder.id
+  folder_id   = yandex_resourcemanager_folder.diploma-folder.id
   role      = "storage.admin"
   members   = [
     "serviceAccount:${yandex_iam_service_account.terraform-sa.id}"
@@ -25,7 +25,7 @@ resource "yandex_resourcemanager_folder_iam_binding" "storage-admin" {
 
 # Allowance to work with encription/decryption.
 resource "yandex_resourcemanager_folder_iam_binding" "encrypterDecrypter" {
-  folder_id = yandex_resourcemanager_folder.diploma-folder.id
+  folder_id   = yandex_resourcemanager_folder.diploma-folder.id
   role      = "kms.keys.encrypterDecrypter"
   members   = [
     "serviceAccount:${yandex_iam_service_account.terraform-sa.id}"
