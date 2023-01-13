@@ -17,5 +17,6 @@ provider "yandex" {
 # Create folder.
 resource "yandex_resourcemanager_folder" "diploma-folder" {
   cloud_id = var.yandex-cloud-id
-  name     = "diploma-folder"
+  name     = var.folder-name
+  #name     = "${var.folder-name}-${terraform.workspace}"
 }
