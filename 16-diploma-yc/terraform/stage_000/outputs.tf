@@ -1,13 +1,19 @@
+output "yc-cloud-id" {
+  value = var.yandex-cloud-id
+}
+
 output "yc-folder-id" {
   value = yandex_resourcemanager_folder.diploma-folder.id
 }
 
-output "access_key" {
-  sensitive = true
-  value = yandex_iam_service_account_static_access_key.bucket-static_access_key.access_key
+output "yc-zone-1" {
+  value = var.yandex-cloud-zone1
 }
 
-output "secret_key" {
-  sensitive = true
-  value = yandex_iam_service_account_static_access_key.bucket-static_access_key.secret_key
+output "yc-zone-2" {
+  value = var.yandex-cloud-zone2
+}
+
+output "yc-zone-3" {
+  value = var.yandex-cloud-zone3
 }
