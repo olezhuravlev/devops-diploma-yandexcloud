@@ -1,8 +1,8 @@
 # Service Account to be used by Terraform.
 resource "yandex_iam_service_account" "terraform-sa" {
   folder_id   = yandex_resourcemanager_folder.diploma-folder.id
-  #name        = "terraform-sa-${terraform.workspace}"
   name        = "terraform-sa"
+  #name        = "terraform-sa-${terraform.workspace}"
   description = "Service account to allow Terraform to manage catalog"
 }
 

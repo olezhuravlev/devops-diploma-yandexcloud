@@ -24,6 +24,6 @@ data "terraform_remote_state" "vpc" {
 
     skip_region_validation      = true
     skip_credentials_validation = true
-    workspace_key_prefix        = "tf-state"
+    workspace_key_prefix        = "workspaces"
   }
 }
