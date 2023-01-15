@@ -13,8 +13,9 @@ provider "yandex" {
 }
 
 data "terraform_remote_state" "vpc" {
-  backend = "s3"
-  config  = {
+  backend   = "s3"
+  workspace = terraform.workspace
+  config    = {
     endpoint = "storage.yandexcloud.net"
     bucket   = "tf-backend"
     region   = "ru-central1"

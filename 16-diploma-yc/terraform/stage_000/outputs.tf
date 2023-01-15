@@ -17,3 +17,17 @@ output "yc-zone-2" {
 output "yc-zone-3" {
   value = var.yandex-cloud-zone3
 }
+
+output "current-workspace-name" {
+  value = terraform.workspace
+}
+
+# A unique identifier for this run.
+variable "TFC_RUN_ID" {
+  type    = string
+  default = ""
+}
+
+output "remote_execution_determine" {
+  value = "Run environment: %{if var.TFC_RUN_ID != ""}Remote%{else}Local%{endif}"
+}

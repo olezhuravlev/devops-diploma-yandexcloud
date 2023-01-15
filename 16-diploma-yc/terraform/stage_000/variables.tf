@@ -24,5 +24,5 @@ variable "yandex-cloud-zone3" {
 }
 
 variable "folder-name" {
-  default = "diploma-folder2"
+  default = "diploma-folder"
 }
