@@ -1,21 +1,14 @@
+# Base Terraform provider definition.
 terraform {
   required_providers {
     yandex = {
       source = "yandex-cloud/yandex"
     }
   }
+
   required_version = ">= 0.13"
-}
 
-provider "yandex" {
-  cloud_id = data.terraform_remote_state.vpc.outputs.yc-cloud-id
-  zone     = data.terraform_remote_state.vpc.outputs.yc-zone-1
-}
-
-data "terraform_remote_state" "vpc" {
-  backend   = "s3"
-  workspace = terraform.workspace
-  config    = {
+  backend "s3" {
     endpoint = "storage.yandexcloud.net"
     bucket   = "tf-backend"
     region   = "ru-central1"
@@ -27,4 +20,9 @@ data "terraform_remote_state" "vpc" {
     skip_credentials_validation = true
     workspace_key_prefix        = "workspaces"
   }
+}
+
+# Define provider.
+provider "yandex" {
+  zone = var.yc-zone
 }

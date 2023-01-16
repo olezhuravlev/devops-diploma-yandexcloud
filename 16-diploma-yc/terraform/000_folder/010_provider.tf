@@ -10,7 +10,5 @@ terraform {
 
 # Define provider.
 provider "yandex" {
-#  cloud_id = var.yc-id
-#  folder_id = var.yc-folder-id
   zone     = var.yc-zone
 }

@@ -1,7 +1,6 @@
 # Create Storage Bucket.
 resource "yandex_storage_bucket" "backend-encrypted" {
   bucket     = var.backend_bucket_id
-  #bucket     = "${var.backend_bucket_id}-${terraform.workspace}"
   access_key = yandex_iam_service_account_static_access_key.bucket-static_access_key.access_key
   secret_key = yandex_iam_service_account_static_access_key.bucket-static_access_key.secret_key
 
