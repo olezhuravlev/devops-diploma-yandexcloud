@@ -1,3 +1,4 @@
+# Base Terraform provider definition.
 terraform {
   required_providers {
     yandex = {
@@ -7,9 +8,11 @@ terraform {
   required_version = ">= 0.13"
 }
 
+# Define provider.
 provider "yandex" {
-  cloud_id = data.terraform_remote_state.vpc.outputs.yc-cloud-id
-  zone     = data.terraform_remote_state.vpc.outputs.yc-zone-1
+  #  cloud_id = var.yc-id
+  #  folder_id = var.yc-folder-id
+  zone = var.yc-zone
 }
 
 data "terraform_remote_state" "vpc" {
