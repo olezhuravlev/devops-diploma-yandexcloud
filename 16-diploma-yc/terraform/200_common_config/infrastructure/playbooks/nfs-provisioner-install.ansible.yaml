@@ -1,0 +1,33 @@
+---
+- name: Setup Kubernetes Cluster
+  hosts: k8n_control_plane
+  tasks:
+    - name: Install dynamic storage provisioner
+      block:
+        - name: Download  'Helm' installation script
+          ansible.builtin.get_url:
+            url: https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+            dest: /home/ubuntu/get-helm-3.sh
+            mode: '0750'
+        - name: Install 'Helm' with the installation script
+          ansible.builtin.shell: /home/ubuntu/get-helm-3.sh
+        - name: Add 'helm' stable chart repo
+          kubernetes.core.helm_repository:
+            name: stable
+            repo_url: https://charts.helm.sh/stable
+        - name: Update `Helm` repository cache
+          kubernetes.core.helm:
+            name: dummy
+            namespace: kube-system
+            state: absent
+            update_repo_cache: true
+        - name: Install Helm `diff` plugin
+          kubernetes.core.helm_plugin:
+            plugin_path: https://github.com/databus23/helm-diff
+            state: present
+        - name: Deploy 'nfs-server-provisioner' latest version
+          kubernetes.core.helm:
+            name: nfs-server
+            chart_ref: stable/nfs-server-provisioner
+            release_namespace: default
+            create_namespace: false

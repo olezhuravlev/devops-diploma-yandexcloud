@@ -20,15 +20,15 @@ variable "yandex-cloud-zone3" {
 
 # CIDR for private subnet 1.
 variable "ipv4_cidr_private_subnet1" {
-  default = "192.168.10.0/24"
+  default = "10.10.0.0/16"
 }
 
 # CIDR for private subnet 2.
 variable "ipv4_cidr_private_subnet2" {
-  default = "192.168.20.0/24"
+  default = "10.20.0.0/16"
 }
 
 # CIDR for private subnet 3.
 variable "ipv4_cidr_private_subnet3" {
-  default = "192.168.30.0/24"
+  default = "10.30.0.0/16"
 }

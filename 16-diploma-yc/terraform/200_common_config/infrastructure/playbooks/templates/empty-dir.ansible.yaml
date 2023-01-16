@@ -1,0 +1,23 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: empty-dir-example
+  labels:
+    app: empty-dir-example
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+      volumeMounts:
+        - mountPath: "/static"
+          name: my-empty-volume
+    - name: busybox
+      image: busybox
+      command: ["sleep", "3600"]
+      volumeMounts:
+        - mountPath: "/static"
+          name: my-empty-volume
+  volumes:
+    - name: my-empty-volume
+      emptyDir: {}

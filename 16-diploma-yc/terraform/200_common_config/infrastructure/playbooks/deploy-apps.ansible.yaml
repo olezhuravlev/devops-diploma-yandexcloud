@@ -1,0 +1,30 @@
+---
+- name: Setup Kubernetes Cluster
+  hosts: k8n_control_plane
+  tasks:
+    - name: Setup database
+      block:
+      - name: Upload manifest for PersistentVolume
+        ansible.builtin.template:
+          src: ./templates/pg-pv.yaml
+          dest: /home/ubuntu/pg-pv.yaml
+      - name: Apply manifest for PersistentVolume
+        ansible.builtin.command: kubectl apply -f /home/ubuntu/pg-pv.yaml
+      - name: Upload manifest for StatefulSet
+        ansible.builtin.template:
+          src: ./templates/deploy-pg.yaml
+          dest: /home/ubuntu/deploy-pg.yaml
+      - name: Apply manifest for StatefulSet
+        ansible.builtin.command: kubectl apply -f /home/ubuntu/deploy-pg.yaml
+      - name: Upload manifest for frontend
+        ansible.builtin.template:
+          src: ./templates/back-and-front/deploy-frontend.yaml
+          dest: /home/ubuntu/deploy-frontend.yaml
+      - name: Apply manifest for frontend
+        ansible.builtin.command: kubectl apply -f /home/ubuntu/deploy-frontend.yaml
+      - name: Upload manifest for backend
+        ansible.builtin.template:
+          src: ./templates/back-and-front/deploy-backend.yaml
+          dest: /home/ubuntu/deploy-backend.yaml
+      - name: Apply manifest for backend
+        ansible.builtin.command: kubectl apply -f /home/ubuntu/deploy-backend.yaml

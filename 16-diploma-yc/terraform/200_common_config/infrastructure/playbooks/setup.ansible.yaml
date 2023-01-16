@@ -1,0 +1,76 @@
+---
+- name: Setup common tools
+  hosts: k8n_cluster
+  tasks:
+    - name: Install common tools
+      become: true
+      ansible.builtin.apt:
+        name: "{{ packages }}"
+        state: present
+        update_cache: yes
+      vars:
+        packages:
+          - nfs-common
+          - mc
+
+- name: Setup Kubernetes Cluster
+  hosts: k8n_control_plane
+  tasks:
+    - name: Install control plane-specific tools
+      become: true
+      ansible.builtin.apt:
+        name: "{{ packages }}"
+        state: present
+        update_cache: yes
+      vars:
+        packages:
+          - git
+          - pip
+
+    - name: Install 'Calico' as binary
+      become: true
+      ansible.builtin.get_url:
+        url: https://github.com/projectcalico/calico/releases/download/v3.24.1/calicoctl-linux-amd64
+        dest: /usr/bin
+        mode: '0750'
+
+    - name: Install 'Kubespray'
+      block:
+        - name: Clone 'Kubespray' from git-repository
+          ansible.builtin.git:
+            repo: "{{ kubespray_gitclone_url }}"
+            dest: "{{ kubespray_dir }}"
+            single_branch: yes
+            version: master
+            update: no
+            depth: 1
+
+        - name: Install required tools for 'Kubespray'
+          become: true
+          ansible.builtin.pip:
+            requirements: "{{ kubespray_dir }}/requirements.txt"
+
+        - name: Copy example inventory
+          ansible.builtin.copy:
+            src: "{{ kubespray_dir }}/inventory/{{ cluster_source_dir }}/"
+            dest: "{{ kubespray_dir }}/inventory/{{ cluster_destination_dir }}"
+            remote_src: true
+            directory_mode: true
+
+        - name: Upload content of 'k8s-cluster' directory to host
+          ansible.builtin.copy:
+            src: ./k8s_cluster/
+            dest: "{{ kubespray_dir }}/inventory/{{ cluster_destination_dir }}/group_vars/k8s_cluster/"
+            remote_src: false
+            directory_mode: true
+
+        - name: Upload 'hosts.yml' to host
+          ansible.builtin.template:
+            src: ./templates/hosts.ansible.yaml.j2
+            dest: "{{ kubespray_dir }}/inventory/{{ cluster_destination_dir }}/hosts.yaml"
+
+    - name: Upload private key to host (to allow 'Kubespray' establish ssh-connections to nodes)
+      ansible.builtin.copy:
+        src: ./templates/id_rsa
+        dest: "~/.ssh/id_rsa"
+        mode: 0600

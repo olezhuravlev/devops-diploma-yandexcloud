@@ -1,0 +1,48 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pv-example
+  namespace: default
+  labels:
+    app: pv-example
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: pv-example
+  template:
+    metadata:
+      labels:
+        app: pv-example
+    spec:
+      containers:
+        - name: nginx
+          image: nginx
+          volumeMounts:
+            - mountPath: "/static"
+              name: my-pv-volume
+        - name: busybox
+          image: busybox
+          command: ["sleep", "3600"]
+          volumeMounts:
+            - mountPath: "/static"
+              name: my-pv-volume
+      volumes:
+        - name: my-pv-volume
+          persistentVolumeClaim:
+            claimName: pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pv-example
+  namespace: default
+  labels:
+    app: pv-example
+spec:
+  ports:
+    - name: web
+      port: 80
+  selector:
+    app: pv-example

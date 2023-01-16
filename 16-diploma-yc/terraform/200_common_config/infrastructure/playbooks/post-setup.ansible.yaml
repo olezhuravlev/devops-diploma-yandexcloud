@@ -1,0 +1,6 @@
+---
+- name: Setup Kubernetes Cluster
+  hosts: localhost
+  tasks:
+    - name: Clean up temporary files
+      ansible.builtin.shell: rm ./templates/id_rsa

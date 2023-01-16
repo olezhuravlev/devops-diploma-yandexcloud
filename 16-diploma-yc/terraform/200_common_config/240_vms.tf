@@ -1,36 +1,136 @@
-# Config to test 'for_each' operator.
-module "vm-test-for-each" {
-  source        = "./modules/instance"
-  subnet_id     = yandex_vpc_subnet.vpc-subnet-private1.id
-  cores         = local.cores[terraform.workspace]
-  disk_size     = local.disk_size[terraform.workspace]
-  instance_type = local.instance_type[terraform.workspace]
+# Create service account.
+#resource "yandex_iam_service_account" "kubernetes-iam-sa" {
+#  folder_id   = yandex_resourcemanager_folder.kubernetes-folder.id
+#  name        = "kubernetes-iam-sa-${terraform.workspace}"
+#  description = "Service account to be used by Terraform"
+#}
 
-  #  We'll use 'for_each' here instead of 'count'.
-  instance_count = 1
-  for_each       = toset(["vm-1", "vm-2", "vm-3"])
-  instance_name  = each.key
-  image_family   = "centos-7"
-  instance_zone  = yandex_vpc_subnet.vpc-subnet-private1.zone
+# Grant permission "container-registry" on folder "yandex-folder-id" for service account.
+#resource "yandex_resourcemanager_folder_iam_member" "iam-member-storage-editor" {
+#  folder_id = yandex_resourcemanager_folder.kubernetes-folder.id
+#  role      = "container-registry.admin"
+#  member    = "serviceAccount:${yandex_iam_service_account.kubernetes-iam-sa.id}"
+#}
 
-  nat = true
+# Create Static Access Keys
+#resource "yandex_iam_service_account_static_access_key" "terraform-sa-static-key" {
+#  service_account_id = yandex_iam_service_account.kubernetes-iam-sa.id
+#  description        = "Static access key for service account"
+#}
+
+# Use keys to create bucket
+#resource "yandex_storage_bucket" "kubernetes-bucket" {
+#  access_key = yandex_iam_service_account_static_access_key.terraform-sa-static-key.access_key
+#  secret_key = yandex_iam_service_account_static_access_key.terraform-sa-static-key.secret_key
+#  bucket     = "kubernetes-bucket-${terraform.workspace}"
+#  grant {
+#    id          = yandex_iam_service_account.kubernetes-iam-sa.id
+#    type        = "CanonicalUser"
+#    permissions = ["READ", "WRITE"]
+#  }
+#}
+#
+#resource "yandex_vpc_security_group" "nodes-ssh-access" {
+#
+#  name        = "redis-nodes-ssh-access"
+#  description = "Connection via SSH. Should be applied only to group of nodes."
+#  folder_id   = yandex_resourcemanager_folder.kubernetes-folder.id
+#  network_id  = yandex_vpc_network.kubernetes-network.id
+#
+#  ingress {
+#    protocol       = "TCP"
+#    description    = "Allow connection via SSH from designated nodes."
+#    v4_cidr_blocks = ["0.0.0.0/0"]
+#    port           = 22
+#  }
+#
+#  ingress {
+#    protocol       = "ANY"
+#    description    = "Redis Cluster client connections."
+#    v4_cidr_blocks = ["0.0.0.0/0"]
+#    port           = 6379
+#  }
+#
+#  ingress {
+#    protocol       = "ANY"
+#    description    = "Redis Cluster bus connections."
+#    v4_cidr_blocks = ["0.0.0.0/0"]
+#    port           = 16379
+#  }
+
+#  ingress {
+#    protocol       = "ANY"
+#    description    = "All incoming traffic allowed."
+#    v4_cidr_blocks = ["0.0.0.0/0"]
+#    from_port      = 0
+#    to_port        = 65535
+#  }
+#
+#  egress {
+#    protocol       = "ANY"
+#    description    = "All outgoing traffic allowed."
+#    v4_cidr_blocks = ["0.0.0.0/0"]
+#    from_port      = 0
+#    to_port        = 65535
+#  }
+#}
+
+module "vm-for-each" {
+  source         = "./modules/instance"
+  #sec_group_id   = yandex_vpc_security_group.nodes-ssh-access.id
+  cores          = local.cores[each.key]
+  memory         = local.memory[each.key]
+  boot_disk_size = local.boot_disk_size[each.key]
+  boot_disk_type = "network-hdd"
+  users = "ubuntu"
+
+  for_each      = toset(["cp1", "node1", "node2"])
+  instance_name = each.key
+  image_family  = "ubuntu-2004-lts"
+  nat           = true
+  instance_zone = local.ipv4_zones[each.key]
+  subnet_id     = local.ipv4_subnets[each.key]
+  ipv4_internal = local.ipv4_internals[each.key]
 }
 
 locals {
+
+  # CPU total 32 max!
   cores = {
-    stage = 2
-    prod  = 4
+    cp1   = 4
+    node1 = 2
+    node2 = 2
   }
-  disk_size = {
-    stage = 20
-    prod  = 40
+
+  # RAM total 128Gb max!
+  memory = {
+    cp1   = 4
+    node1 = 2
+    node2 = 2
   }
-  instance_count = {
-    stage = 1
-    prod  = 2
+
+  # HDD total 500Gb max!
+  boot_disk_size = {
+    cp1   = 51
+    node1 = 51
+    node2 = 51
   }
-  instance_type = {
-    stage = "standard-v1"
-    prod  = "standard-v2"
+
+  ipv4_zones = {
+    cp1   = var.yandex-cloud-zone1
+    node1 = var.yandex-cloud-zone2
+    node2 = var.yandex-cloud-zone3
+  }
+
+  ipv4_subnets = {
+    cp1   = yandex_vpc_subnet.vpc-subnet-private1.id
+    node1 = yandex_vpc_subnet.vpc-subnet-private2.id
+    node2 = yandex_vpc_subnet.vpc-subnet-private3.id
+  }
+
+  ipv4_internals = {
+    cp1   = "10.10.10.1"
+    node1 = "10.20.20.1"
+    node2 = "10.30.30.1"
   }
 }

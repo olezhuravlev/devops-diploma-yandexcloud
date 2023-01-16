@@ -1,0 +1,73 @@
+---
+# PostgreSQL StatefulSet
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres-sts
+  labels:
+    app: web-news
+    component: dbase
+spec:
+  serviceName: postgres-svc
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web-news
+      component: dbase
+  template:
+    metadata:
+      labels:
+        app: web-news
+        component: dbase
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:13-alpine
+        volumeMounts:
+          - name: postgres-volume
+            mountPath: /postgresVolume
+        ports:
+          - name: postgres-port
+            containerPort: 5432
+            protocol: TCP
+        env:
+          - name: POSTGRES_PASSWORD
+            value: postgres
+          - name: POSTGRES_USER
+            value: postgres
+          - name: POSTGRES_DB
+            value: news
+          - name: PGDATA
+            value: /postgresVolume/data
+  # Volume Claim
+  volumeClaimTemplates:
+  - metadata:
+      name: postgres-volume
+      labels:
+        component: dbase
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 1Gi
+---
+# NodePort: Exposes the Service on each Node's IP at a static port.
+apiVersion: v1
+kind: Service
+metadata:
+  name: db
+  namespace: default
+  labels:
+    app: web-news
+    component: dbase
+spec:
+  type: NodePort
+  selector:
+    app: web-news
+    component: dbase
+  ports:
+  - name: postgres-nodeport
+    protocol: TCP
+    nodePort: 30002 # Port to apply from outside (to see ips - 'kubectl get nodes -o wide').
+    port: 5432 # Port to apply from inside (to see ips - 'kubectl get svc').
+    targetPort: postgres-port # Port to map acces to (to see ips - 'kubectl get pods -o wide')
