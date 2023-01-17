@@ -87,10 +87,10 @@ module "vm-for-each" {
   for_each      = toset(["cp1", "node1", "node2"])
   instance_name = each.key
   image_family  = "ubuntu-2004-lts"
-  nat           = true
   instance_zone = local.ipv4_zones[each.key]
   subnet_id     = local.ipv4_subnets[each.key]
   ipv4_internal = local.ipv4_internals[each.key]
+  nat           = local.ipv4_nats[each.key]
 }
 
 locals {
@@ -132,5 +132,11 @@ locals {
     cp1   = "10.10.10.1"
     node1 = "10.20.20.1"
     node2 = "10.30.30.1"
+  }
+
+  ipv4_nats = {
+    cp1   = true
+    node1 = true
+    node2 = true
   }
 }
