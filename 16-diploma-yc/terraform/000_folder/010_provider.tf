@@ -10,5 +10,5 @@ terraform {
 
 # Define provider.
 provider "yandex" {
-  zone     = var.yc-zone
+  zone = var.yc-zone
 }
