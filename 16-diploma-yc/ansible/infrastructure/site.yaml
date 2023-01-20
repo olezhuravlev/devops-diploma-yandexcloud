@@ -5,5 +5,5 @@
 - import_playbook: playbooks/grant-permissions.ansible.yaml
 - import_playbook: playbooks/post-setup.ansible.yaml
 - import_playbook: playbooks/deploy-dashboard.ansible.yaml
-#- import_playbook: playbooks/deploy-apps.ansible.yaml
 - import_playbook: playbooks/nfs-provisioner-install.ansible.yaml
+- import_playbook: playbooks/deploy-web-app.ansible.yaml
