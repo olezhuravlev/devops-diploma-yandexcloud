@@ -1,0 +1,38 @@
+---
+- name: Setup Gitlab infrastructure
+  hosts: k8n_control_plane
+  tasks:
+    - name: Install PostgreSQL
+      block:
+        - name: Add stable 'Helm' chart repo
+          kubernetes.core.helm_repository:
+            name: stable
+            repo_url: https://charts.helm.sh/stable
+        - name: Update `Helm` repository cache
+          kubernetes.core.helm:
+            name: dummy
+            namespace: kube-system
+            state: absent
+            update_repo_cache: true
+        - name: Upload manifest for PostgreSQL PersistentVolume
+          ansible.builtin.template:
+            src: ./templates/pg-pv.yaml
+            dest: /home/ubuntu/pg-pv.yaml
+        - name: Apply manifest for PostgreSQL PersistentVolume
+          ansible.builtin.command: kubectl apply -f /home/ubuntu/pg-pv.yaml
+        - name: Deploy the latest version of PostgreSQL
+          kubernetes.core.helm:
+            #state: absent
+            name: pg-gitlab
+            chart_ref: stable/postgresql
+            release_namespace: cicd
+            create_namespace: true
+            values:
+              volumePermissions:
+                enabled: true # Otherwise - "Permission denied" error.
+              global:
+                postgresql:
+                  auth:
+                    postgresPassword: admin
+                    database: gitlab
+                storageClass: gitlab-storage

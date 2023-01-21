@@ -1,0 +1,57 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: redis-pv-8gb-1
+  namespace: cicd
+  labels:
+    app: gitlab
+    component: redis
+spec:
+  storageClassName: nfs-client
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 8Gi
+  volumeMode: Filesystem
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /redis-pv-8gb-1
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: redis-pv-8gb-2
+  namespace: cicd
+  labels:
+    app: gitlab
+    component: redis
+spec:
+  storageClassName: nfs-client
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 8Gi
+  volumeMode: Filesystem
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /redis-pv-8gb-2
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: redis-pv-8gb-3
+  namespace: cicd
+  labels:
+    app: gitlab
+    component: redis
+spec:
+  storageClassName: nfs-client
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 8Gi
+  volumeMode: Filesystem
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /redis-pv-8gb-3
