@@ -1,0 +1,84 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: teamcity-server
+  namespace: cicd
+  labels:
+    app: teamcity
+    component: teamcity-server
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: teamcity
+      component: teamcity-server
+  template:
+    metadata:
+      labels:
+        app: teamcity
+        component: teamcity-server
+    spec:
+      containers:
+        - name: teamcity-server
+          image: jetbrains/teamcity-server
+          ports:
+            - containerPort: 8111
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /teamcity-server
+              name: teamcity-server-volume
+      volumes:
+        - name: teamcity-server-volume
+          persistentVolumeClaim:
+            claimName: teamcity-server-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: teamcity-server-svc
+  namespace: cicd
+  labels:
+    app: teamcity
+    component: teamcity-server
+spec:
+  ports:
+    - name: teamcity-server-web
+      port: 8111
+  selector:
+    app: teamcity
+    component: teamcity-server
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: teamcity-server-pvc
+  namespace: cicd
+  labels:
+    app: teamcity
+    component: teamcity-server
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: teamcity-server-pv
+  namespace: cicd
+  labels:
+    app: teamcity
+    component: teamcity-server
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 1Gi
+  volumeMode: Filesystem
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /teamcity-server-1gb
