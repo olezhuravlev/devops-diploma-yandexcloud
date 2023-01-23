@@ -1,6 +1,6 @@
 # Yandex.Cloud folder.
 variable "yc-folder-name" {
-  default = "diploma-folder"
+  default = "netology-folder"
 }
 
 # Yandex.Cloud zone.

@@ -1,0 +1,11 @@
+---
+- name: Setup TeamCity
+  hosts: tc-server
+  tasks:
+    - name: Deploy TeamCity
+      docker_container:
+        name: tc-server
+        image: jetbrains/teamcity-server
+        state: started
+        ports:
+          - "8111:8111"
