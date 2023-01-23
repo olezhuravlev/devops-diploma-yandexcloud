@@ -29,9 +29,15 @@ spec:
           env:
             - name: SERVER_URL
               value: "teamcity-server-svc.cicd.svc.cluster.local:8111"
+            - name: DOCKER_IN_DOCKER
+              value: start
+          securityContext:
+            privileged: true
+            runAsUser: 0
           volumeMounts:
             - mountPath: /teamcity-agent
               name: teamcity-agent-volume
+#            - var/run/docker.sock:/var/run/docker.sock
       volumes:
         - name: teamcity-agent-volume
           persistentVolumeClaim:

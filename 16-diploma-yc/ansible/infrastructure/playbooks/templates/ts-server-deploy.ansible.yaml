@@ -26,6 +26,9 @@ spec:
           ports:
             - containerPort: 8111
               protocol: TCP
+          securityContext:
+            privileged: true
+            runAsUser: 0
           volumeMounts:
             - mountPath: /teamcity-server
               name: teamcity-server-volume
