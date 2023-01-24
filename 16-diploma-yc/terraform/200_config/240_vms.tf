@@ -85,7 +85,8 @@ module "vm-for-each" {
   users          = "ubuntu"
 
   #for_each      = toset(["cp1", "node1", "node2", "teamcity-server"])
-  for_each      = toset(["teamcity-server"])
+  for_each      = toset(["teamcity-server", "teamcity-agent"])
+#  for_each      = toset(["teamcity-server"])
   instance_name = each.key
   image_family  = local.image_family[each.key]
   instance_zone = local.ipv4_zones[each.key]
