@@ -1,14 +1,14 @@
-#---
-#- name: Deploy TeamCity Server
-#  hosts: tc-server
-#  tasks:
-#    - name: Install TeamCity server
-#      docker_container:
-#        name: tc-server
-#        image: jetbrains/teamcity-server
-#        state: started
-#        ports:
-#          - "8111:8111"
+---
+- name: Deploy TeamCity Server
+  hosts: tc-server
+  tasks:
+    - name: Install TeamCity server
+      docker_container:
+        name: tc-server
+        image: jetbrains/teamcity-server
+        state: started
+        ports:
+          - "8111:8111"
 - name: Deploy TeamCity Agent
   hosts: tc-agent
   tasks:
@@ -16,17 +16,15 @@
       block:
         - name: Create Teamcity Agent folder
           ansible.builtin.file:
-            path: /home/ubuntu/teamcity_agent/conf
+            path: "/home/ubuntu/teamcity_agent/conf"
             state: directory
-            mode: '0777'
-        - name: Install TeamCity Agent
+            mode: "0777"
+        - name: Install TeamCity Agent from Docker image
           docker_container:
             name: tc-agent
             image: jetbrains/teamcity-agent:2022.10.1-linux-sudo
             privileged: true
             state: started
-            ports:
-              - "9090:9090"
             volumes:
               - "/home/ubuntu/teamcity_agent/conf:/data/teamcity_agent/conf"
             env:
