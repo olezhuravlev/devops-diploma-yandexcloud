@@ -11,12 +11,14 @@
           - "8111:8111"
 - name: Deploy TeamCity Agent
   hosts: tc-agent
+  vars:
+    agent_folder_path: "/home/ubuntu/teamcity_agent/conf"
   tasks:
     - name: Install TeamCity Agent
       block:
         - name: Create Teamcity Agent folder
           ansible.builtin.file:
-            path: "/home/ubuntu/teamcity_agent/conf"
+            path: "{{ agent_folder_path }}"
             state: directory
             mode: "0777"
         - name: Install TeamCity Agent from Docker image
@@ -26,8 +28,16 @@
             privileged: true
             state: started
             volumes:
-              - "/home/ubuntu/teamcity_agent/conf:/data/teamcity_agent/conf"
+              - "{{ agent_folder_path }}:/data/teamcity_agent/conf"
             env:
               SERVER_URL: "10.10.10.10:8111"
               DOCKER_IN_DOCKER: "start"
-
+#    - name: Install Helm on TeamCity Agent host
+#      block:
+#        - name: Download  'Helm' installation script
+#          ansible.builtin.get_url:
+#            url: https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+#            dest: /home/ubuntu/get-helm-3.sh
+#            mode: '0750'
+#        - name: Install 'Helm' with the installation script
+#          ansible.builtin.shell: /home/ubuntu/get-helm-3.sh

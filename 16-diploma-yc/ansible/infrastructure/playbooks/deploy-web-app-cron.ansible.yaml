@@ -1,0 +1,16 @@
+---
+- name: Scheduled tasks
+  hosts: k8n_control_plane
+  tasks:
+    - name: Periodic web-application update
+      ansible.builtin.cron:
+        name: "helm-web-app-update-30min"
+        state: present
+        minute: "*/30"
+        hour: "*"
+        day: "*"
+        month: "*"
+        weekday: "*"
+        job: '/usr/local/bin/helm repo add diploma-chart https://olezhuravlev.github.io/diploma-chart/charts/;
+        /usr/local/bin/helm repo update;
+        /usr/local/bin/helm upgrade --install web-app diploma-chart/web-app --atomic;'
